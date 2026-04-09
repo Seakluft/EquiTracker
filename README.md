@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EquiTracker 🐎
 
-## Getting Started
+EquiTracker est une application web moderne pour la gestion et le suivi des séances d'équitation. Conçue avec **Next.js**, **Tailwind CSS**, et **Prisma (SQLite)**, elle est optimisée pour l'auto-hébergement et la facilité d'utilisation.
 
-First, run the development server:
+## 🚀 Fonctionnalités
+- **Calendrier Intelligent :** Génération automatique des samedis de septembre à juin.
+- **Vacances Scolaires (Zone B) :** Intégration de l'API officielle pour masquer les séances pendant les vacances (le samedi de départ est maintenu).
+- **Gestion Complète :** CRUD pour les chevaux et les disciplines (support PNG).
+- **Statistiques :** Analyse des séances par cheval, disciplines favorites et estimation des calories brûlées.
+- **Édition Totale :** Modifiez n'importe quelle séance (passée ou future) à tout moment.
 
+## 🛠️ Installation & Lancement avec Docker
+
+Le moyen le plus simple de lancer EquiTracker est d'utiliser Docker.
+
+### 1. Cloner le dépôt
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/Seakluft/EquiTracker.git
+cd EquiTracker
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Lancer avec Docker Compose
+L'application est configurée pour utiliser le port **8765**.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+docker-compose up --build -d
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Accéder à l'application
+Ouvrez votre navigateur et rendez-vous sur :
+**[http://localhost:8765](http://localhost:8765)**
 
-## Learn More
+## ⚙️ Configuration Initiale
+1. Allez dans l'onglet **Paramètres**.
+2. Configurez vos tarifs (Licence, Forfait Annuel).
+3. Ajoutez vos **Chevaux** et vos **Disciplines**.
+4. Cliquez sur **"Générer la Saison"** pour initialiser votre calendrier.
 
-To learn more about Next.js, take a look at the following resources:
+## 📂 Structure Technique
+- **Framework :** Next.js 15+ (App Router)
+- **Base de données :** SQLite (via Prisma) - Fichier persistant `prisma/dev.db`
+- **Style :** Tailwind CSS
+- **Icônes :** Lucide-React
+- **API :** data.education.gouv.fr (Vacances Zone B)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+Développé pour simplifier le suivi de votre passion équestre.
