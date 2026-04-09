@@ -1,0 +1,8 @@
+services:
+  equitracker:
+    build: .
+    ports:
+      - "8765:8765"
+    volumes:
+      - ./prisma/dev.db:/app/prisma/dev.db
+    restart: always

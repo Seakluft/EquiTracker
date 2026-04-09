@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Horse {
+  id       String   @id @default(cuid())
+  name     String
+  imageUrl String?
+  lessons  Lesson[]
+}
+
+model Discipline {
+  id      String   @id @default(cuid())
+  name    String
+  iconUrl String?
+  lessons Lesson[]
+}
+
+model Lesson {
+  id           String      @id @default(cuid())
+  date         DateTime
+  isAbsent     Boolean     @default(false)
+  horseId      String?
+  horse        Horse?      @relation(fields: [horseId], references: [id])
+  disciplineId String?
+  discipline   Discipline? @relation(fields: [disciplineId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([date])
+}
+
+model Settings {
+  id           Int   @id @default(1)
+  licensePrice Float @default(0)
+  annualFee    Float @default(0)
+}
