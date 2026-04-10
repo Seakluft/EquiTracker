@@ -7,13 +7,24 @@ export default async function HomePage() {
   const horses = await getHorses();
   const disciplines = await getDisciplines();
 
-  // On récupère les vacances pour l'année scolaire en cours (basé sur la 1ère leçon ou date actuelle)
-  const firstLessonDate = allLessons.length > 0 ? new Date(allLessons[0].date) : new Date();
-  const yearStart = firstLessonDate.getMonth() >= 8 ? firstLessonDate.getFullYear() : firstLessonDate.getFullYear() - 1;
-  const holidays = await fetchZoneBHolidays(yearStart);
+  // On récupère les saisons présentes dans les leçons
+  const seasons = Array.from(new Set(allLessons.map(l => {
+    const d = new Date(l.date);
+    return d.getMonth() >= 8 ? d.getFullYear() : d.getFullYear() - 1;
+  })));
+
+  // On récupère les vacances pour toutes les saisons concernées
+  const holidaysByYear = await Promise.all(
+    seasons.map(async (year) => ({ year, holidays: await fetchZoneBHolidays(year) }))
+  );
 
   // Filtrage strict : on ne garde que les leçons qui NE sont PAS pendant les vacances
-  const lessons = allLessons.filter(lesson => !isHoliday(new Date(lesson.date), holidays));
+  const lessons = allLessons.filter(lesson => {
+    const d = new Date(lesson.date);
+    const yearStart = d.getMonth() >= 8 ? d.getFullYear() : d.getFullYear() - 1;
+    const yearHolidays = holidaysByYear.find(h => h.year === yearStart)?.holidays || [];
+    return !isHoliday(d, yearHolidays);
+  });
 
   return (
     <div className="space-y-8">

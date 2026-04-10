@@ -1,15 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import LessonModal from "./LessonModal";
 import { Horse, Discipline, Lesson } from "@prisma/client";
+import { groupLessonsBySeason, getSeasonFromDate } from "@/lib/season";
 
 type LessonWithDetails = Lesson & { horse: Horse | null; discipline: Discipline | null };
 
 export default function CalendarView({
-  lessons,
+  lessons: allLessons,
   horses,
   disciplines,
 }: {
@@ -19,10 +20,42 @@ export default function CalendarView({
 }) {
   const [selectedLesson, setSelectedLesson] = useState<LessonWithDetails | null>(null);
 
+  // Grouper les leçons par saison
+  const seasons = useMemo(() => {
+    const grouped = groupLessonsBySeason(allLessons);
+    return Object.keys(grouped).sort().reverse(); // Plus récentes en premier
+  }, [allLessons]);
+
+  // Saison active (par défaut la plus récente)
+  const [activeSeason, setActiveSeason] = useState<string>(seasons[0] || "");
+
+  const activeLessons = useMemo(() => {
+    return allLessons.filter(l => getSeasonFromDate(l.date) === activeSeason);
+  }, [allLessons, activeSeason]);
+
   return (
     <>
+      {/* Sélecteur de Saisons (Tabs) */}
+      {seasons.length > 1 && (
+        <div className="mb-6 flex flex-wrap gap-2 border-b pb-4">
+          {seasons.map((season) => (
+            <button
+              key={season}
+              onClick={() => setActiveSeason(season)}
+              className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
+                activeSeason === season
+                  ? "bg-indigo-600 text-white shadow-sm"
+                  : "bg-white text-slate-600 border hover:bg-slate-50"
+              }`}
+            >
+              Saison {season}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {lessons.map((lesson) => (
+        {activeLessons.map((lesson) => (
           <button
             key={lesson.id}
             onClick={() => setSelectedLesson(lesson)}
