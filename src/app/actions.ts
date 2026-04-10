@@ -99,9 +99,7 @@ export async function generateSeason(year: number) {
     });
 
     if (holiday) {
-      // Si c'est un jour de vacances et qu'une leçon existe, on la supprime
-      // (Optionnel: seulement si elle n'a pas encore de cheval/discipline assigné pour éviter de perdre des données saisies ?)
-      // Pour l'instant on suit la consigne de masquer (donc supprimer du calendrier généré)
+      // Si c'est un jour de vacances, on s'assure qu'aucune leçon n'existe
       if (existing) {
         await prisma.lesson.delete({
           where: { id: existing.id }

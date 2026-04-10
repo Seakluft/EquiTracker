@@ -1,11 +1,20 @@
 import { getLessons, getHorses, getSettings, getDisciplines } from "@/app/actions";
 import { Horse, Discipline, Lesson } from "@prisma/client";
+import { fetchZoneBHolidays, isHoliday } from "@/services/holiday";
 
 export default async function StatsPage() {
-  const lessons = await getLessons();
+  const allLessons = await getLessons();
   const horses = await getHorses();
   const settings = await getSettings();
   const disciplines = await getDisciplines();
+
+  // On récupère les vacances pour l'année scolaire en cours
+  const firstLessonDate = allLessons.length > 0 ? new Date(allLessons[0].date) : new Date();
+  const yearStart = firstLessonDate.getMonth() >= 8 ? firstLessonDate.getFullYear() : firstLessonDate.getFullYear() - 1;
+  const holidays = await fetchZoneBHolidays(yearStart);
+
+  // Filtrage strict : on ne garde que les leçons qui NE sont PAS pendant les vacances
+  const lessons = allLessons.filter(lesson => !isHoliday(new Date(lesson.date), holidays));
 
   const presentLessons = lessons.filter(l => !l.isAbsent);
   const totalCalories = presentLessons.length * 450; // Estimation: 450 kcal per 1h session

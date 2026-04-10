@@ -1,10 +1,19 @@
 import { getLessons, getHorses, getDisciplines } from "@/app/actions";
 import CalendarView from "@/components/CalendarView";
+import { fetchZoneBHolidays, isHoliday } from "@/services/holiday";
 
 export default async function HomePage() {
-  const lessons = await getLessons();
+  const allLessons = await getLessons();
   const horses = await getHorses();
   const disciplines = await getDisciplines();
+
+  // On récupère les vacances pour l'année scolaire en cours (basé sur la 1ère leçon ou date actuelle)
+  const firstLessonDate = allLessons.length > 0 ? new Date(allLessons[0].date) : new Date();
+  const yearStart = firstLessonDate.getMonth() >= 8 ? firstLessonDate.getFullYear() : firstLessonDate.getFullYear() - 1;
+  const holidays = await fetchZoneBHolidays(yearStart);
+
+  // Filtrage strict : on ne garde que les leçons qui NE sont PAS pendant les vacances
+  const lessons = allLessons.filter(lesson => !isHoliday(new Date(lesson.date), holidays));
 
   return (
     <div className="space-y-8">
