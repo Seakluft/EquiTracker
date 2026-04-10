@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -29,17 +26,17 @@ model Lesson {
   date         DateTime
   isAbsent     Boolean     @default(false)
   horseId      String?
-  horse        Horse?      @relation(fields: [horseId], references: [id])
   disciplineId String?
-  discipline   Discipline? @relation(fields: [disciplineId], references: [id])
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
+  discipline   Discipline? @relation(fields: [disciplineId], references: [id])
+  horse        Horse?      @relation(fields: [horseId], references: [id])
 
   @@index([date])
 }
 
 model Settings {
-  id           Int   @id @default(1)
+  id           Int   @id @default(autoincrement())
   licensePrice Float @default(0)
   annualFee    Float @default(0)
 }

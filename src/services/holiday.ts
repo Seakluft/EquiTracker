@@ -8,17 +8,30 @@ export interface Holiday {
 
 export async function fetchZoneBHolidays(yearStart: number): Promise<Holiday[]> {
   const anneeScolaire = `${yearStart}-${yearStart + 1}`;
-  const url = `https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-calendrier-scolaire/records?where=location%20%3D%20%22Zone%20B%22%20AND%20annee_scolaire%20%3D%20%22${anneeScolaire}%22&order_by=start_date%20ASC&limit=50`;
+  const url = `https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-calendrier-scolaire/records?where=zones%20%3D%20%22Zone%20B%22%20AND%20annee_scolaire%20%3D%20%22${anneeScolaire}%22&order_by=start_date%20ASC&limit=100`;
 
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error("Failed to fetch holidays");
     const data = await response.json();
-    return data.results.map((record: any) => ({
-      start_date: record.start_date,
-      end_date: record.end_date,
-      description: record.description,
-    }));
+    
+    // On ne garde qu'un seul enregistrement par période de vacances (unique start_date/end_date)
+    const uniqueHolidays: Holiday[] = [];
+    const seen = new Set<string>();
+
+    for (const record of data.results) {
+      const key = `${record.start_date}_${record.end_date}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        uniqueHolidays.push({
+          start_date: record.start_date,
+          end_date: record.end_date,
+          description: record.description,
+        });
+      }
+    }
+
+    return uniqueHolidays;
   } catch (error) {
     console.error("Error fetching holidays:", error);
     return [];
@@ -32,25 +45,28 @@ export function isHoliday(date: Date, holidays: Holiday[]): boolean {
     const start = startOfDay(parseISO(holiday.start_date));
     const end = startOfDay(parseISO(holiday.end_date));
 
-    // Si les vacances commencent un vendredi soir, le samedi qui suit est MAINTENU.
-    // L'API donne souvent le start_date comme le samedi matin si les vacances commencent le vendredi soir.
-    // Vérifions si le start_date est un samedi.
-    const startDay = getDay(start);
+    // Règle : Le samedi qui suit le dernier vendredi de cours est AFFICHÉ.
+    // L'API donne souvent le début des vacances le samedi (ou le vendredi soir).
+    // On considère que les vacances pour notre calendrier (qui n'affiche que les samedis)
+    // commencent réellement le DIMANCHE qui suit le début officiel.
     
-    let effectiveStart = start;
-    if (startDay === 5 || startDay === 6) { // Vendredi ou Samedi
-      // Si les vacances commencent le vendredi soir ou le samedi, on maintient CE samedi.
-      // On commence les "vacances" le dimanche.
-      // On trouve le dimanche suivant le début des vacances.
-      const daysToAdd = (7 - startDay) % 7;
-      effectiveStart = addDays(start, daysToAdd === 0 ? 1 : daysToAdd);
-      // Wait, simple logic: if it's Fri (5), add 2 days -> Sunday.
-      // If it's Sat (6), add 1 day -> Sunday.
-      if (startDay === 5) effectiveStart = addDays(start, 2);
-      if (startDay === 6) effectiveStart = addDays(start, 1);
+    // Si start est un samedi, le premier samedi de vacances est ce jour là, on veut l'afficher.
+    // Si start est un vendredi, le samedi suivant est le lendemain, on veut aussi l'afficher.
+    
+    const startDay = getDay(start);
+    let effectiveStartHoliday = start;
+    
+    if (startDay === 6) { // Samedi
+      // Si les vacances commencent le samedi, on commence à masquer à partir du samedi SUIVANT.
+      effectiveStartHoliday = addDays(start, 1);
+    } else if (startDay === 5) { // Vendredi
+      // Si les vacances commencent le vendredi soir, on maintient le samedi (le lendemain).
+      effectiveStartHoliday = addDays(start, 2);
     }
+    // Pour les autres jours (rare pour le début des vacances), on laisse tel quel.
 
-    if (isAfter(d, addDays(effectiveStart, -1)) && isBefore(d, addDays(end, 1))) {
+    // On masque si d est >= effectiveStartHoliday et d < end
+    if ((d.getTime() >= effectiveStartHoliday.getTime()) && (d.getTime() < end.getTime())) {
       return true;
     }
   }

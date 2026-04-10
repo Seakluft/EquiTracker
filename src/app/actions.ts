@@ -92,13 +92,23 @@ export async function generateSeason(year: number) {
   const holidays = await fetchZoneBHolidays(year);
   const saturdays = generateSaturdays(year);
 
-  // Clear existing lessons for this period if any? 
-  // Maybe just skip if already exists.
   for (const date of saturdays) {
-    if (!isHoliday(date, holidays)) {
-      const existing = await prisma.lesson.findFirst({
-        where: { date: { equals: date } }
-      });
+    const holiday = isHoliday(date, holidays);
+    const existing = await prisma.lesson.findFirst({
+      where: { date: { equals: date } }
+    });
+
+    if (holiday) {
+      // Si c'est un jour de vacances et qu'une leçon existe, on la supprime
+      // (Optionnel: seulement si elle n'a pas encore de cheval/discipline assigné pour éviter de perdre des données saisies ?)
+      // Pour l'instant on suit la consigne de masquer (donc supprimer du calendrier généré)
+      if (existing) {
+        await prisma.lesson.delete({
+          where: { id: existing.id }
+        });
+      }
+    } else {
+      // Si ce n'est pas les vacances, on s'assure que la leçon existe
       if (!existing) {
         await prisma.lesson.create({
           data: { date }
