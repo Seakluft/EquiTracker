@@ -89,6 +89,15 @@ export async function updateLesson(id: string, data: {
   revalidatePath("/stats");
 }
 
+export async function createLesson(date: Date) {
+  const lesson = await prisma.lesson.create({
+    data: { date },
+  });
+  revalidatePath("/");
+  revalidatePath("/stats");
+  return lesson;
+}
+
 export async function generateSeason(year: number) {
   const holidays = await fetchZoneBHolidays(year);
   const saturdays = generateSaturdays(year);

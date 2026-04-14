@@ -6,7 +6,8 @@ import { fr } from "date-fns/locale";
 import LessonModal from "./LessonModal";
 import { Horse, Discipline, Lesson } from "@prisma/client";
 import { groupLessonsBySeason, getSeasonFromDate } from "@/lib/season";
-import { NotebookText } from "lucide-react";
+import { NotebookText, Plus, X } from "lucide-react";
+import { createLesson } from "@/app/actions";
 
 type LessonWithDetails = Lesson & { horse: Horse | null; discipline: Discipline | null };
 
@@ -20,6 +21,8 @@ export default function CalendarView({
   disciplines: Discipline[];
 }) {
   const [selectedLesson, setSelectedLesson] = useState<LessonWithDetails | null>(null);
+  const [isAddingDate, setIsAddingDate] = useState(false);
+  const [newDate, setNewDate] = useState(format(new Date(), "yyyy-MM-dd"));
 
   // Grouper les leçons par saison
   const seasons = useMemo(() => {
@@ -50,27 +53,45 @@ export default function CalendarView({
       });
   }, [allLessons, activeSeason, search, filterHorse, filterDiscipline]);
 
+  async function handleAddManualLesson() {
+     const date = new Date(newDate);
+     date.setHours(12, 0, 0, 0); // Heure standard
+     await createLesson(date);
+     setIsAddingDate(false);
+     window.location.reload();
+  }
+
   return (
     <>
-      {/* Sélecteur de Saisons (Tabs) */}
+      {/* Barre de Saisons et Actions */}
       <div className="mb-8 flex flex-col gap-6">
-        {seasons.length > 1 && (
-          <div className="flex flex-wrap gap-2 border-b border-stone-200 pb-4 overflow-x-auto no-scrollbar">
-            {seasons.map((season) => (
-              <button
-                key={season}
-                onClick={() => setActiveSeason(season)}
-                className={`whitespace-nowrap rounded-xl px-5 py-2 text-sm font-black transition-all duration-300 ${
-                  activeSeason === season
-                    ? "bg-[#78350f] text-[#fef3c7] shadow-lg shadow-orange-900/20 scale-105"
-                    : "bg-white text-stone-500 border border-stone-200 hover:bg-stone-50"
-                }`}
-              >
-                Saison {season}
-              </button>
-            ))}
-          </div>
-        )}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-stone-200 pb-4">
+          {seasons.length > 0 && (
+            <div className="flex flex-wrap gap-2 overflow-x-auto no-scrollbar">
+              {seasons.map((season) => (
+                <button
+                  key={season}
+                  onClick={() => setActiveSeason(season)}
+                  className={`whitespace-nowrap rounded-xl px-5 py-2 text-sm font-black transition-all duration-300 ${
+                    activeSeason === season
+                      ? "bg-[#78350f] text-[#fef3c7] shadow-lg shadow-orange-900/20 scale-105"
+                      : "bg-white text-stone-500 border border-stone-200 hover:bg-stone-50"
+                  }`}
+                >
+                  Saison {season}
+                </button>
+              ))}
+            </div>
+          )}
+          
+          <button 
+            onClick={() => setIsAddingDate(true)}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-6 py-2 text-sm font-black text-[#fef3c7] shadow-xl shadow-stone-200 hover:bg-stone-800 transition-all active:scale-95"
+          >
+            <Plus className="h-4 w-4" />
+            Nouvelle séance
+          </button>
+        </div>
 
         {/* Barre de Recherche et Filtres */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 animate-in fade-in slide-in-from-top-4 duration-500">
@@ -186,6 +207,39 @@ export default function CalendarView({
           disciplines={disciplines}
           onClose={() => setSelectedLesson(null)}
         />
+      )}
+
+      {/* Modal d'ajout de date manuelle */}
+      {isAddingDate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/40 p-4 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="w-full max-w-sm rounded-3xl border border-white bg-white/90 p-8 shadow-2xl glass animate-in zoom-in duration-300">
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-xl font-black tracking-tight text-stone-800">Nouvelle séance</h2>
+              <button onClick={() => setIsAddingDate(false)} className="rounded-full p-2 text-stone-400 hover:bg-stone-100 transition-colors">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              <div>
+                <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-stone-400">Date du cours</label>
+                <input
+                  type="date"
+                  value={newDate}
+                  onChange={(e) => setNewDate(e.target.value)}
+                  className="w-full rounded-2xl border border-stone-200 bg-white p-4 font-black text-stone-700 outline-none focus:ring-4 focus:ring-orange-100"
+                />
+              </div>
+              
+              <button
+                onClick={handleAddManualLesson}
+                className="w-full rounded-2xl bg-[#78350f] py-4 font-black text-[#fef3c7] shadow-xl shadow-orange-900/20 hover:bg-[#451a03] transition-all active:scale-95"
+              >
+                Créer la séance
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );
