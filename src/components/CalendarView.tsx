@@ -6,6 +6,7 @@ import { fr } from "date-fns/locale";
 import LessonModal from "./LessonModal";
 import { Horse, Discipline, Lesson } from "@prisma/client";
 import { groupLessonsBySeason, getSeasonFromDate } from "@/lib/season";
+import { NotebookText } from "lucide-react";
 
 type LessonWithDetails = Lesson & { horse: Horse | null; discipline: Discipline | null };
 
@@ -149,11 +150,16 @@ export default function CalendarView({
                   }`}>
                     {lesson.horse?.name || "À définir"}
                   </span>
-                  <span className={`truncate text-xs font-bold transition-colors ${
-                    lesson.isAbsent ? "text-stone-300" : isFilled ? "text-[#78350f]" : "text-stone-300"
-                  }`}>
-                    {lesson.discipline?.name || "Repos"}
-                  </span>
+                  <div className="flex items-center gap-1.5 overflow-hidden">
+                    <span className={`truncate text-xs font-bold transition-colors ${
+                      lesson.isAbsent ? "text-stone-300" : isFilled ? "text-[#78350f]" : "text-stone-300"
+                    }`}>
+                      {lesson.discipline?.name || "Repos"}
+                    </span>
+                    {lesson.notes && (
+                      <NotebookText className="h-3 w-3 text-emerald-600 shrink-0" />
+                    )}
+                  </div>
                 </div>
               </div>
 

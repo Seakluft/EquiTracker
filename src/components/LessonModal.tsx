@@ -21,6 +21,7 @@ export default function LessonModal({
   const [isAbsent, setIsAbsent] = useState(lesson.isAbsent);
   const [horseId, setHorseId] = useState(lesson.horseId || "");
   const [disciplineId, setDisciplineId] = useState(lesson.disciplineId || "");
+  const [notes, setNotes] = useState(lesson.notes || "");
   const [loading, setLoading] = useState(false);
 
   async function handleSave() {
@@ -29,6 +30,7 @@ export default function LessonModal({
       isAbsent,
       horseId: horseId || null,
       disciplineId: disciplineId || null,
+      notes: notes || null,
     });
     setLoading(false);
     onClose();
@@ -107,6 +109,16 @@ export default function LessonModal({
                     </button>
                   ))}
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black text-stone-400 uppercase tracking-widest mb-2 ml-1">Détails de la séance</label>
+                <textarea
+                  placeholder="Qu'as-tu travaillé aujourd'hui ? (équilibre, incurvation, sauts...)"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  className="w-full min-h-[120px] rounded-2xl border border-stone-200 bg-white p-4 text-sm font-bold text-stone-700 focus:ring-4 focus:ring-orange-100 focus:border-[#78350f]/40 outline-none transition-all resize-none shadow-inner"
+                />
               </div>
             </div>
           )}

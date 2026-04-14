@@ -79,6 +79,7 @@ export async function updateLesson(id: string, data: {
   isAbsent?: boolean;
   horseId?: string | null;
   disciplineId?: string | null;
+  notes?: string | null;
 }) {
   await prisma.lesson.update({
     where: { id },

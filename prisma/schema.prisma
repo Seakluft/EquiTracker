@@ -27,6 +27,7 @@ model Lesson {
   isAbsent     Boolean     @default(false)
   horseId      String?
   disciplineId String?
+  notes        String?
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   discipline   Discipline? @relation(fields: [disciplineId], references: [id])
