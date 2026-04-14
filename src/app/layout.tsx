@@ -20,26 +20,34 @@ export default function RootLayout({
     <html lang="fr">
       <body className={`${inter.className} bg-slate-50 text-slate-900`}>
         <div className="flex min-h-screen flex-col">
-          <header className="sticky top-0 z-10 border-b bg-white">
-            <div className="container mx-auto flex h-16 items-center justify-between px-4">
-              <Link href="/" className="flex items-center gap-2 font-bold text-indigo-600 transition-colors hover:text-indigo-500">
-                <Sparkles className="h-6 w-6" />
-                <span className="text-xl">EquiTracker</span>
+          <header className="sticky top-0 z-50 border-b border-slate-100/50 bg-white/70 backdrop-blur-xl">
+            <div className="container mx-auto flex h-20 items-center justify-between px-6">
+              <Link href="/" className="flex items-center gap-3 transition-transform hover:scale-105 active:scale-95 group">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-600 shadow-lg shadow-indigo-200 group-hover:bg-indigo-500 transition-colors">
+                  <Sparkles className="h-6 w-6 text-white" />
+                </div>
+                <span className="text-xl font-black tracking-tighter text-slate-800">EquiTracker</span>
               </Link>
-              <nav className="flex items-center gap-6">
-                <Link href="/" className="flex items-center gap-1 text-sm font-medium hover:text-indigo-600">
+              <nav className="hidden md:flex items-center gap-2">
+                <Link href="/" className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-50 hover:text-indigo-600 transition-all">
                   <Calendar className="h-4 w-4" />
                   Calendrier
                 </Link>
-                <Link href="/stats" className="flex items-center gap-1 text-sm font-medium hover:text-indigo-600">
+                <Link href="/stats" className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-50 hover:text-indigo-600 transition-all">
                   <ChartBar className="h-4 w-4" />
                   Stats
                 </Link>
-                <Link href="/settings" className="flex items-center gap-1 text-sm font-medium hover:text-indigo-600">
+                <Link href="/settings" className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-50 hover:text-indigo-600 transition-all">
                   <SettingsIcon className="h-4 w-4" />
                   Paramètres
                 </Link>
               </nav>
+              <div className="flex items-center gap-4">
+                 <div className="hidden sm:block h-10 w-px bg-slate-100"></div>
+                 <div className="h-10 w-10 rounded-full bg-slate-100 border-2 border-white shadow-sm overflow-hidden flex items-center justify-center font-black text-slate-400 text-xs">
+                    JR
+                 </div>
+              </div>
             </div>
           </header>
           <main className="flex-1 overflow-auto p-4 md:p-8">
