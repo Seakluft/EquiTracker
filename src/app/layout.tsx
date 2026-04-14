@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
-import { Calendar, ChartBar, Settings as SettingsIcon, Sparkles } from "lucide-react";
+import { Calendar, ChartBar, Settings as SettingsIcon, Sparkles, Horse as HorseIcon } from "lucide-react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -44,9 +44,9 @@ export default function RootLayout({
               </nav>
               <div className="flex items-center gap-4">
                  <div className="hidden sm:block h-10 w-px bg-stone-100"></div>
-                 <div className="h-10 w-10 rounded-full bg-stone-100 border-2 border-white shadow-sm overflow-hidden flex items-center justify-center font-black text-stone-400 text-xs">
-                    JR
-                 </div>
+                 <Link href="/settings" className="h-10 w-10 rounded-full bg-[#fef3c7] border-2 border-white shadow-sm overflow-hidden flex items-center justify-center font-black text-[#78350f] transition-all hover:scale-110 active:scale-95">
+                    <HorseIcon className="h-5 w-5" />
+                 </Link>
               </div>
             </div>
           </header>
