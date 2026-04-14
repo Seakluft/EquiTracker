@@ -28,34 +28,88 @@ export default function CalendarView({
 
   // Saison active (par défaut la plus récente)
   const [activeSeason, setActiveSeason] = useState<string>(seasons[0] || "");
+  
+  // Filtres
+  const [search, setSearch] = useState("");
+  const [filterHorse, setFilterHorse] = useState("");
+  const [filterDiscipline, setFilterDiscipline] = useState("");
 
-  const activeLessons = useMemo(() => {
-    return allLessons.filter(l => getSeasonFromDate(l.date) === activeSeason);
-  }, [allLessons, activeSeason]);
+  const filteredLessons = useMemo(() => {
+    return allLessons
+      .filter(l => getSeasonFromDate(l.date) === activeSeason)
+      .filter(l => {
+        const matchesSearch = 
+          (l.horse?.name || "").toLowerCase().includes(search.toLowerCase()) ||
+          (l.discipline?.name || "").toLowerCase().includes(search.toLowerCase());
+        
+        const matchesHorse = filterHorse === "" || l.horseId === filterHorse;
+        const matchesDiscipline = filterDiscipline === "" || l.disciplineId === filterDiscipline;
+        
+        return matchesSearch && matchesHorse && matchesDiscipline;
+      });
+  }, [allLessons, activeSeason, search, filterHorse, filterDiscipline]);
 
   return (
     <>
       {/* Sélecteur de Saisons (Tabs) */}
-      {seasons.length > 1 && (
-        <div className="mb-6 flex flex-wrap gap-2 border-b pb-4">
-          {seasons.map((season) => (
-            <button
-              key={season}
-              onClick={() => setActiveSeason(season)}
-              className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
-                activeSeason === season
-                  ? "bg-indigo-600 text-white shadow-sm"
-                  : "bg-white text-slate-600 border hover:bg-slate-50"
-              }`}
-            >
-              Saison {season}
-            </button>
-          ))}
+      <div className="mb-8 flex flex-col gap-6">
+        {seasons.length > 1 && (
+          <div className="flex flex-wrap gap-2 border-b border-stone-200 pb-4 overflow-x-auto no-scrollbar">
+            {seasons.map((season) => (
+              <button
+                key={season}
+                onClick={() => setActiveSeason(season)}
+                className={`whitespace-nowrap rounded-xl px-5 py-2 text-sm font-black transition-all duration-300 ${
+                  activeSeason === season
+                    ? "bg-[#78350f] text-[#fef3c7] shadow-lg shadow-orange-900/20 scale-105"
+                    : "bg-white text-stone-500 border border-stone-200 hover:bg-stone-50"
+                }`}
+              >
+                Saison {season}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Barre de Recherche et Filtres */}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 animate-in fade-in slide-in-from-top-4 duration-500">
+          <div className="relative group sm:col-span-2 lg:col-span-2">
+            <input
+              type="text"
+              placeholder="Rechercher un cheval ou une discipline..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-2xl border border-stone-200 bg-white p-4 pl-12 text-sm font-bold text-stone-700 focus:ring-4 focus:ring-orange-100 focus:border-[#78350f]/40 outline-none transition-all card-shadow"
+            />
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300 group-focus-within:text-[#78350f] transition-colors">
+               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+               </svg>
+            </div>
+          </div>
+
+          <select
+            value={filterHorse}
+            onChange={(e) => setFilterHorse(e.target.value)}
+            className="rounded-2xl border border-stone-200 bg-white p-4 text-sm font-black text-stone-700 focus:ring-4 focus:ring-orange-100 outline-none transition-all card-shadow appearance-none cursor-pointer"
+          >
+            <option value="">Tous les chevaux</option>
+            {horses.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
+          </select>
+
+          <select
+            value={filterDiscipline}
+            onChange={(e) => setFilterDiscipline(e.target.value)}
+            className="rounded-2xl border border-stone-200 bg-white p-4 text-sm font-black text-stone-700 focus:ring-4 focus:ring-orange-100 outline-none transition-all card-shadow appearance-none cursor-pointer"
+          >
+            <option value="">Toutes disciplines</option>
+            {disciplines.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+          </select>
         </div>
-      )}
+      </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {activeLessons.map((lesson) => {
+        {filteredLessons.map((lesson) => {
           const isFilled = lesson.horseId || lesson.disciplineId;
           return (
             <button
