@@ -27,15 +27,6 @@ export default function CalendarView({
   
   const todayRef = useRef<HTMLButtonElement>(null);
 
-  // Défilement auto vers aujourd'hui
-  useEffect(() => {
-    if (todayRef.current) {
-      setTimeout(() => {
-        todayRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      }, 500);
-    }
-  }, [activeSeason]); // Re-défiler si on change de saison
-  
   // Grouper les leçons par saison
   const seasons = useMemo(() => {
     const grouped = groupLessonsBySeason(allLessons);
@@ -44,6 +35,15 @@ export default function CalendarView({
 
   // Saison active (par défaut la plus récente)
   const [activeSeason, setActiveSeason] = useState<string>(seasons[0] || "");
+
+  // Défilement auto vers aujourd'hui
+  useEffect(() => {
+    if (todayRef.current) {
+      setTimeout(() => {
+        todayRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 500);
+    }
+  }, [activeSeason]); // Re-défiler si on change de saison
   
   // Filtres
   const [search, setSearch] = useState("");
@@ -64,6 +64,14 @@ export default function CalendarView({
         return matchesSearch && matchesHorse && matchesDiscipline;
       });
   }, [allLessons, activeSeason, search, filterHorse, filterDiscipline]);
+
+  // Trouver la séance la plus proche d'aujourd'hui
+  const closestToNowId = useMemo(() => {
+    const now = new Date();
+    return filteredLessons
+      .filter(l => !isAfter(new Date(l.date), now) || isSameDay(new Date(l.date), now))
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]?.id;
+  }, [filteredLessons]);
 
   async function handleAddManualLesson() {
      const date = new Date(newDate);
@@ -158,38 +166,31 @@ export default function CalendarView({
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {(() => {
-          // Trouver la séance la plus proche d'aujourd'hui (soit aujourd'hui, soit la dernière passée)
-          const now = new Date();
-          const closestToNowId = filteredLessons
-            .filter(l => !isAfter(new Date(l.date), now) || isSameDay(new Date(l.date), now))
-            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]?.id;
-
-          return filteredLessons.map((lesson) => {
-            const isFilled = lesson.horseId || lesson.disciplineId;
-            const isToday = lesson.id === closestToNowId;
-            
-            return (
-              <button
-                key={lesson.id}
-                ref={isToday ? todayRef : null}
-                onClick={() => setSelectedLesson(lesson)}
-                className={`group relative flex flex-col overflow-hidden rounded-2xl border text-left transition-all card-hover card-shadow ${
-                  isToday ? "border-[#78350f] ring-2 ring-orange-100" : ""
-                } ${
-                  lesson.isAbsent
-                    ? "border-stone-100 bg-stone-50/50 grayscale"
-                    : isFilled 
-                      ? "border-white bg-white hover:border-[#78350f]/20" 
-                      : "border-stone-200 bg-white/50 border-dashed"
-                }`}
-              >
-                {isToday && (
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-[#78350f]"></div>
-                )}
-                <div className={`flex h-10 items-center justify-between px-4 py-2 text-[10px] font-bold uppercase tracking-wider ${
-                  lesson.isAbsent ? "text-stone-400" : isToday ? "text-[#78350f]" : "text-stone-500"
-                }`}>
+        {filteredLessons.map((lesson) => {
+          const isFilled = lesson.horseId || lesson.disciplineId;
+          const isToday = lesson.id === closestToNowId;
+          
+          return (
+            <button
+              key={lesson.id}
+              ref={isToday ? todayRef : null}
+              onClick={() => setSelectedLesson(lesson)}
+              className={`group relative flex flex-col overflow-hidden rounded-2xl border text-left transition-all card-hover card-shadow ${
+                isToday ? "border-[#78350f] ring-2 ring-orange-100" : ""
+              } ${
+                lesson.isAbsent
+                  ? "border-stone-100 bg-stone-50/50 grayscale"
+                  : isFilled 
+                    ? "border-white bg-white hover:border-[#78350f]/20" 
+                    : "border-stone-200 bg-white/50 border-dashed"
+              }`}
+            >
+              {isToday && (
+                <div className="absolute top-0 left-0 right-0 h-1 bg-[#78350f]"></div>
+              )}
+              <div className={`flex h-10 items-center justify-between px-4 py-2 text-[10px] font-bold uppercase tracking-wider ${
+                lesson.isAbsent ? "text-stone-400" : isToday ? "text-[#78350f]" : "text-stone-500"
+              }`}>
                 {format(new Date(lesson.date), "dd MMMM yyyy", { locale: fr })}
                 {lesson.isAbsent && <span className="rounded-full bg-rose-50 px-2 py-0.5 text-rose-500">Absent</span>}
               </div>
