@@ -6,7 +6,7 @@ import { fr } from "date-fns/locale";
 import LessonModal from "./LessonModal";
 import { Horse, Discipline, Lesson } from "@prisma/client";
 import { groupLessonsBySeason, getSeasonFromDate } from "@/lib/season";
-import { NotebookText, Plus, X } from "lucide-react";
+import { NotebookText, Plus, X, Filter, Search } from "lucide-react";
 import { createLesson } from "@/app/actions";
 
 type LessonWithDetails = Lesson & { horse: Horse | null; discipline: Discipline | null };
@@ -22,6 +22,7 @@ export default function CalendarView({
 }) {
   const [selectedLesson, setSelectedLesson] = useState<LessonWithDetails | null>(null);
   const [isAddingDate, setIsAddingDate] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [newDate, setNewDate] = useState(format(new Date(), "yyyy-MM-dd"));
 
   // Grouper les leçons par saison
@@ -84,49 +85,64 @@ export default function CalendarView({
             </div>
           )}
           
-          <button 
-            onClick={() => setIsAddingDate(true)}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-6 py-2 text-sm font-black text-[#fef3c7] shadow-xl shadow-stone-200 hover:bg-stone-800 transition-all active:scale-95"
-          >
-            <Plus className="h-4 w-4" />
-            Nouvelle séance
-          </button>
+          <div className="flex w-full sm:w-auto items-center gap-2">
+            <button 
+              onClick={() => setShowFilters(!showFilters)}
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-2 rounded-xl border px-5 py-2 text-sm font-black transition-all active:scale-95 md:hidden ${
+                showFilters ? "bg-stone-100 border-stone-300 text-stone-900" : "bg-white border-stone-200 text-stone-500"
+              }`}
+            >
+              <Filter className="h-4 w-4" />
+              Filtrer
+            </button>
+            <button 
+              onClick={() => setIsAddingDate(true)}
+              className="flex-[2] sm:flex-none flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-6 py-2 text-sm font-black text-[#fef3c7] shadow-xl shadow-stone-200 hover:bg-stone-800 transition-all active:scale-95"
+            >
+              <Plus className="h-4 w-4" />
+              Nouvelle séance
+            </button>
+          </div>
         </div>
 
         {/* Barre de Recherche et Filtres */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 animate-in fade-in slide-in-from-top-4 duration-500">
+        <div className={`grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 animate-in fade-in slide-in-from-top-4 duration-500 ${
+          showFilters ? "block" : "hidden md:grid"
+        }`}>
           <div className="relative group sm:col-span-2 lg:col-span-2">
             <input
               type="text"
-              placeholder="Rechercher un cheval ou une discipline..."
+              placeholder="Rechercher un cheval..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full rounded-2xl border border-stone-200 bg-white p-4 pl-12 text-sm font-bold text-stone-700 focus:ring-4 focus:ring-orange-100 focus:border-[#78350f]/40 outline-none transition-all card-shadow"
             />
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300 group-focus-within:text-[#78350f] transition-colors">
-               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-               </svg>
+               <Search className="h-5 w-5" />
             </div>
           </div>
 
-          <select
-            value={filterHorse}
-            onChange={(e) => setFilterHorse(e.target.value)}
-            className="rounded-2xl border border-stone-200 bg-white p-4 text-sm font-black text-stone-700 focus:ring-4 focus:ring-orange-100 outline-none transition-all card-shadow appearance-none cursor-pointer"
-          >
-            <option value="">Tous les chevaux</option>
-            {horses.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
-          </select>
+          <div className="relative">
+            <select
+              value={filterHorse}
+              onChange={(e) => setFilterHorse(e.target.value)}
+              className="w-full rounded-2xl border border-stone-200 bg-white p-4 text-sm font-black text-stone-700 focus:ring-4 focus:ring-orange-100 outline-none transition-all card-shadow appearance-none cursor-pointer"
+            >
+              <option value="">Tous les chevaux</option>
+              {horses.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
+            </select>
+          </div>
 
-          <select
-            value={filterDiscipline}
-            onChange={(e) => setFilterDiscipline(e.target.value)}
-            className="rounded-2xl border border-stone-200 bg-white p-4 text-sm font-black text-stone-700 focus:ring-4 focus:ring-orange-100 outline-none transition-all card-shadow appearance-none cursor-pointer"
-          >
-            <option value="">Toutes disciplines</option>
-            {disciplines.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-          </select>
+          <div className="relative">
+            <select
+              value={filterDiscipline}
+              onChange={(e) => setFilterDiscipline(e.target.value)}
+              className="w-full rounded-2xl border border-stone-200 bg-white p-4 text-sm font-black text-stone-700 focus:ring-4 focus:ring-orange-100 outline-none transition-all card-shadow appearance-none cursor-pointer"
+            >
+              <option value="">Toutes disciplines</option>
+              {disciplines.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+            </select>
+          </div>
         </div>
       </div>
 
