@@ -54,7 +54,7 @@ export default function CalendarView({
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {activeLessons.map((lesson) => {
           const isFilled = lesson.horseId || lesson.disciplineId;
           return (
@@ -63,42 +63,42 @@ export default function CalendarView({
               onClick={() => setSelectedLesson(lesson)}
               className={`group relative flex flex-col overflow-hidden rounded-2xl border text-left transition-all card-hover card-shadow ${
                 lesson.isAbsent
-                  ? "border-slate-100 bg-slate-50/50 grayscale"
+                  ? "border-stone-100 bg-stone-50/50 grayscale"
                   : isFilled 
-                    ? "border-white bg-white hover:border-indigo-100" 
-                    : "border-slate-200 bg-white/50 border-dashed"
+                    ? "border-white bg-white hover:border-[#78350f]/20" 
+                    : "border-stone-200 bg-white/50 border-dashed"
               }`}
             >
               <div className={`flex h-10 items-center justify-between px-4 py-2 text-[10px] font-bold uppercase tracking-wider ${
-                lesson.isAbsent ? "text-slate-400" : "text-slate-500"
+                lesson.isAbsent ? "text-stone-400" : "text-stone-500"
               }`}>
                 {format(new Date(lesson.date), "dd MMMM yyyy", { locale: fr })}
-                {lesson.isAbsent && <span className="rounded-full bg-red-50 px-2 py-0.5 text-red-500">Absent</span>}
+                {lesson.isAbsent && <span className="rounded-full bg-rose-50 px-2 py-0.5 text-rose-500">Absent</span>}
               </div>
               
               <div className="flex flex-1 items-center gap-4 p-5">
                 <div className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border transition-colors ${
                   lesson.isAbsent 
-                    ? "border-slate-100 bg-slate-100/50" 
-                    : isFilled ? "border-indigo-50 bg-indigo-50/30 group-hover:bg-indigo-50/50" : "border-slate-100 bg-slate-50"
+                    ? "border-stone-100 bg-stone-100/50" 
+                    : isFilled ? "border-amber-50 bg-[#fef3c7]/30 group-hover:bg-[#fef3c7]/50" : "border-stone-100 bg-stone-50"
                 }`}>
                   {lesson.discipline?.iconUrl ? (
-                    <img src={lesson.discipline.iconUrl} alt={lesson.discipline.name} className="h-10 w-10 object-contain drop-shadow-sm" />
+                    <img src={lesson.discipline.iconUrl} alt={lesson.discipline.name} className="h-10 w-10 object-contain drop-shadow-sm transition-transform group-hover:rotate-6" />
                   ) : (
-                    <div className="text-[10px] text-center px-1 text-slate-300 font-medium">No activity</div>
+                    <div className="text-[10px] text-center px-1 text-stone-300 font-medium italic">Pas d'activité</div>
                   )}
                 </div>
                 
                 <div className="flex flex-col overflow-hidden">
-                  <span className={`text-base font-bold tracking-tight transition-colors ${
-                    lesson.isAbsent ? "text-slate-400 line-through" : isFilled ? "text-slate-900" : "text-slate-400 italic"
+                  <span className={`text-base font-black tracking-tight transition-colors ${
+                    lesson.isAbsent ? "text-stone-400 line-through" : isFilled ? "text-stone-900" : "text-stone-400 italic font-bold"
                   }`}>
                     {lesson.horse?.name || "À définir"}
                   </span>
-                  <span className={`truncate text-xs font-medium transition-colors ${
-                    lesson.isAbsent ? "text-slate-300" : isFilled ? "text-indigo-500/80" : "text-slate-400"
+                  <span className={`truncate text-xs font-bold transition-colors ${
+                    lesson.isAbsent ? "text-stone-300" : isFilled ? "text-[#78350f]" : "text-stone-300"
                   }`}>
-                    {lesson.discipline?.name || "Session à venir"}
+                    {lesson.discipline?.name || "Repos"}
                   </span>
                 </div>
               </div>
@@ -111,7 +111,7 @@ export default function CalendarView({
 
               {lesson.isAbsent && (
                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-                    <div className="h-[2px] w-full bg-slate-400 rotate-12"></div>
+                    <div className="h-[2px] w-full bg-stone-400 rotate-12"></div>
                  </div>
               )}
             </button>

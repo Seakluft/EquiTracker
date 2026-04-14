@@ -92,15 +92,15 @@ export default function StatsView({
   return (
     <div className="space-y-10">
       {/* Tabs */}
-      <div className="flex flex-wrap gap-3 border-b border-slate-200 pb-5">
+      <div className="flex flex-wrap gap-2 border-b border-stone-200 pb-5 overflow-x-auto no-scrollbar">
         {seasons.map((season) => (
           <button
             key={season}
             onClick={() => setActiveSeason(season)}
-            className={`rounded-xl px-5 py-2 text-sm font-bold transition-all duration-200 ${
+            className={`whitespace-nowrap rounded-xl px-5 py-2 text-sm font-bold transition-all duration-300 ${
               activeSeason === season
-                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200 scale-105"
-                : "bg-white text-slate-500 border border-slate-100 hover:bg-slate-50 hover:border-slate-200"
+                ? "bg-[#78350f] text-[#fef3c7] shadow-lg shadow-orange-900/20 scale-105"
+                : "bg-white text-stone-500 border border-stone-200 hover:bg-stone-50"
             }`}
           >
             Saison {season}
@@ -109,48 +109,48 @@ export default function StatsView({
       </div>
 
       {/* Overview Cards */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border border-white bg-white p-6 card-shadow">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Séances (Saison)</p>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-2xl border border-stone-100 bg-white p-6 card-shadow">
+          <p className="text-[10px] font-black uppercase tracking-widest text-stone-400">Séances (Saison)</p>
           <div className="mt-2 flex items-baseline gap-1">
-            <p className="text-3xl font-black text-slate-900">{presentLessons.length}</p>
-            <p className="text-lg font-medium text-slate-400">/ {activeLessons.length}</p>
+            <p className="text-3xl font-black text-stone-900">{presentLessons.length}</p>
+            <p className="text-lg font-bold text-stone-300">/ {activeLessons.length}</p>
           </div>
         </div>
-        <div className="rounded-2xl border border-white bg-white p-6 card-shadow">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Absences & Impact</p>
-          <p className="mt-2 text-3xl font-black text-rose-500">{activeLessons.filter(l => l.isAbsent).length}</p>
-          <p className="mt-1 text-xs font-semibold text-slate-400">-{lossFromAbsence.toFixed(2)}€ perdus</p>
+        <div className="rounded-2xl border border-stone-100 bg-white p-6 card-shadow">
+          <p className="text-[10px] font-black uppercase tracking-widest text-stone-400">Absences & Impact</p>
+          <p className="mt-2 text-3xl font-black text-rose-600">{activeLessons.filter(l => l.isAbsent).length}</p>
+          <p className="mt-1 text-[10px] font-bold text-stone-400">-{lossFromAbsence.toFixed(2)}€ perdus</p>
         </div>
-        <div className="rounded-2xl border border-white bg-white p-6 card-shadow">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Calories brûlées (est.)</p>
-          <p className="mt-2 text-3xl font-black text-orange-500">{totalCalories} <span className="text-lg font-bold text-orange-300">kcal</span></p>
+        <div className="rounded-2xl border border-stone-100 bg-white p-6 card-shadow border-b-4 border-b-orange-400">
+          <p className="text-[10px] font-black uppercase tracking-widest text-stone-400">Calories brûlées (est.)</p>
+          <p className="mt-2 text-3xl font-black text-[#78350f]">{totalCalories} <span className="text-sm font-black text-orange-300 uppercase">kcal</span></p>
         </div>
-        <div className="rounded-2xl border border-white bg-white p-6 card-shadow">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Investissement Saison</p>
-          <p className="mt-2 text-3xl font-black text-indigo-600">{seasonCost.toFixed(2)} <span className="text-lg font-bold text-indigo-300">€</span></p>
-          <p className="mt-1 text-xs font-semibold text-slate-400">~{costPerSession.toFixed(2)}€ / séance</p>
+        <div className="rounded-2xl border border-stone-100 bg-white p-6 card-shadow border-b-4 border-b-emerald-600">
+          <p className="text-[10px] font-black uppercase tracking-widest text-stone-400">Investissement</p>
+          <p className="mt-2 text-3xl font-black text-emerald-700">{seasonCost.toFixed(2)} <span className="text-sm font-black text-emerald-200 uppercase">€</span></p>
+          <p className="mt-1 text-[10px] font-bold text-stone-400">~{costPerSession.toFixed(2)}€ / séance</p>
         </div>
       </div>
 
-      <div className="grid gap-10 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
         {/* Activité Mensuelle */}
-        <div className="rounded-3xl border border-white bg-white p-8 card-shadow">
-          <h2 className="mb-6 text-xl font-black tracking-tight text-slate-800">Activité Mensuelle</h2>
-          <div className="space-y-5">
+        <div className="rounded-3xl border border-stone-100 bg-white p-6 md:p-8 card-shadow">
+          <h2 className="mb-6 text-xl font-black tracking-tight text-stone-800">Activité Mensuelle</h2>
+          <div className="space-y-6">
             {monthlyActivity.map(month => (
               <div key={month.name} className="space-y-2">
-                <div className="flex justify-between text-xs font-bold uppercase tracking-tighter">
-                  <span className="text-slate-600">{month.name}</span>
-                  <span className="text-indigo-500">{month.present} séance(s)</span>
+                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                  <span className="text-stone-500">{month.name}</span>
+                  <span className="text-[#78350f]">{month.present} séance(s)</span>
                 </div>
-                <div className="h-3 w-full rounded-full bg-slate-100 overflow-hidden flex shadow-inner">
+                <div className="h-4 w-full rounded-full bg-stone-100 overflow-hidden flex shadow-inner border border-stone-50">
                   <div
-                    className="h-3 bg-gradient-to-r from-indigo-500 to-indigo-400 transition-all duration-1000 ease-out"
+                    className="h-4 bg-gradient-to-r from-[#78350f] to-[#92400e] transition-all duration-1000 ease-out"
                     style={{ width: `${(month.present / (month.count || 1)) * 100}%` }}
                   ></div>
                   <div
-                    className="h-3 bg-rose-200 transition-all duration-1000 ease-out"
+                    className="h-4 bg-rose-200 transition-all duration-1000 ease-out"
                     style={{ width: `${((month.count - month.present) / (month.count || 1)) * 100}%` }}
                   ></div>
                 </div>
@@ -160,28 +160,28 @@ export default function StatsView({
         </div>
 
         {/* Croisement Discipline x Cheval */}
-        <div className="rounded-3xl border border-white bg-white p-8 card-shadow">
-          <h2 className="mb-6 text-xl font-black tracking-tight text-slate-800">Discipline x Cheval</h2>
+        <div className="rounded-3xl border border-stone-100 bg-white p-6 md:p-8 card-shadow">
+          <h2 className="mb-6 text-xl font-black tracking-tight text-stone-800">Discipline x Cheval</h2>
           <div className="space-y-8">
             {crossStats.map(stat => (
               <div key={stat.discipline} className="space-y-3">
-                <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest flex justify-between items-center">
+                <h3 className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] flex justify-between items-center">
                   <span>{stat.discipline}</span>
-                  <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold text-slate-500">{stat.total} séances</span>
+                  <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-[10px] font-black text-stone-500">{stat.total}</span>
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {stat.horses.map(h => (
-                    <div key={h.name} className="bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-2 text-sm flex items-center gap-3 transition-colors hover:bg-white hover:border-indigo-100 group">
-                      <span className="font-black text-indigo-600 bg-white shadow-sm rounded-lg w-7 h-7 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">{h.count}</span>
-                      <span className="text-slate-700 font-bold">{h.name}</span>
+                    <div key={h.name} className="bg-stone-50/50 border border-stone-100 rounded-xl px-4 py-2 text-sm flex items-center gap-3 transition-all hover:bg-white hover:border-[#78350f]/20 group">
+                      <span className="font-black text-[#78350f] bg-white shadow-sm rounded-lg w-7 h-7 flex items-center justify-center group-hover:bg-[#78350f] group-hover:text-[#fef3c7] transition-colors">{h.count}</span>
+                      <span className="text-stone-700 font-bold tracking-tight">{h.name}</span>
                     </div>
                   ))}
                 </div>
               </div>
             ))}
             {crossStats.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-10 text-center">
-                <p className="text-sm font-medium text-slate-400">Pas encore assez de données croisées.</p>
+              <div className="flex flex-col items-center justify-center py-10 text-center opacity-40">
+                <p className="text-sm font-black text-stone-400 uppercase tracking-widest">Manque de données</p>
               </div>
             )}
           </div>
